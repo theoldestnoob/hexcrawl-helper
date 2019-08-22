@@ -11,13 +11,17 @@ from itertools import product
 
 
 class DieSet:
-    def __init__(self, num, sides):
+    def __init__(self, die_string):
+        if not re.search("^\d+d\d+$", die_string):
+            raise ValueError(f"Invalid die string {die_string}")
+        self.dstring = die_string
+        num, sides = die_string.split("d")
         self.num = int(num)
         self.sides = int(sides)
         self.prob_list = None
 
     def __repr__(self):
-        return f"DieSet({self.num}, {self.sides})"
+        return f"DieSet('{self.dstring}')"
 
     def __eq__(self, other):
         if isinstance(other, DieSet):
@@ -149,10 +153,9 @@ def dstring_parse(dice_string):
     d_tokens = dstring_tokenize(dice_string)
     for token in d_tokens:
         if re.search("^\d+$", token):
-            d_list.append(DieSet(token, 1))
+            d_list.append(DieSet(f"{token}d1"))
         elif token != "+" and token != "-":
-            num, sides = token.split("d")
-            d_list.append(DieSet(num, sides))
+            d_list.append(DieSet(token))
         else:
             d_list.append(token)
     return d_list

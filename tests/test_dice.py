@@ -70,30 +70,30 @@ class TestDstringTokenizer(unittest.TestCase):
 class TestDstringParser(unittest.TestCase):
 
     def test_dstring_parse_xdx(self):
-        self.assertEqual(dice.dstring_parse("1d6"), [dice.DieSet(1, 6)])
+        self.assertEqual(dice.dstring_parse("1d6"), [dice.DieSet("1d6")])
 
     def test_dstring_tokenize_xdx_plus_xdx(self):
         self.assertEqual(dice.dstring_parse("1d10+1d8"),
-                         [dice.DieSet(1, 10), "+", dice.DieSet(1, 8)])
+                         [dice.DieSet("1d10"), "+", dice.DieSet("1d8")])
 
     def test_dstring_tokenize_xdx_minus_xdx(self):
         self.assertEqual(dice.dstring_parse("1d20-1d4"),
-                         [dice.DieSet(1, 20), "-", dice.DieSet(1, 4)])
+                         [dice.DieSet("1d20"), "-", dice.DieSet("1d4")])
 
     def test_dstring_tokenize_xdx_plus_xdx_plus_xdx(self):
         self.assertEqual(dice.dstring_parse("1d4+1d6+1d8"),
-                         [dice.DieSet(1, 4), "+", dice.DieSet(1, 6), "+",
-                          dice.DieSet(1, 8)])
+                         [dice.DieSet("1d4"), "+", dice.DieSet("1d6"), "+",
+                          dice.DieSet("1d8")])
 
     def test_dstring_tokenize_xdx_minus_xdx_minus_xdx(self):
         self.assertEqual(dice.dstring_parse("1d4-1d6-1d8"),
-                         [dice.DieSet(1, 4), "-", dice.DieSet(1, 6), "-",
-                          dice.DieSet(1, 8)])
+                         [dice.DieSet("1d4"), "-", dice.DieSet("1d6"), "-",
+                          dice.DieSet("1d8")])
 
     def test_dstring_tokenize_xdx_plus_xdx_minus_xdx(self):
         self.assertEqual(dice.dstring_parse("1d4+1d6-1d8"),
-                         [dice.DieSet(1, 4), "+", dice.DieSet(1, 6), "-",
-                          dice.DieSet(1, 8)])
+                         [dice.DieSet("1d4"), "+", dice.DieSet("1d6"), "-",
+                          dice.DieSet("1d8")])
 
 
 class TestDiceRoll(unittest.TestCase):
@@ -120,14 +120,21 @@ class TestDiceRoll(unittest.TestCase):
 class TestDieSet(unittest.TestCase):
 
     def setUp(self):
-        self.dieset_1d6 = dice.DieSet(1, 6)
-        self.dieset_1d6_b = dice.DieSet(1, 6)
-        self.dieset_2d4 = dice.DieSet(2, 4)
-        self.dieset_6d1 = dice.DieSet(6, 1)
-        self.dieset_3d3 = dice.DieSet(3, 3)
+        self.dieset_1d6 = dice.DieSet("1d6")
+        self.dieset_1d6_b = dice.DieSet("1d6")
+        self.dieset_2d4 = dice.DieSet("2d4")
+        self.dieset_6d1 = dice.DieSet("6d1")
+        self.dieset_3d3 = dice.DieSet("3d3")
+
+    def test_DieSet_invalid(self):
+        with self.assertRaisesRegex(ValueError,
+                                    "Invalid die string .*"):
+            dice.DieSet("1d6+2")
+            dice.DieSet("1d6+1d4")
+            dice.DieSet("1s8")
 
     def test_DieSet_repr(self):
-        self.assertEqual(self.dieset_1d6.__repr__(), "DieSet(1, 6)")
+        self.assertEqual(self.dieset_1d6.__repr__(), "DieSet('1d6')")
 
     def test_DieSet_eq(self):
         self.assertEqual(self.dieset_1d6, self.dieset_1d6_b)

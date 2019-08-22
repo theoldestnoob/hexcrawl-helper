@@ -135,31 +135,19 @@ class TestDieSet(unittest.TestCase):
     def test_DieSet_neq(self):
         self.assertNotEqual(self.dieset_1d6, self.dieset_2d4)
 
-    def test_DieSet_1d6_roll(self):
+    def test_DieSet_roll(self):
         self.assertTrue(1 <= self.dieset_1d6.roll() <= 6)
-
-    def test_DieSet_2d4_roll(self):
         self.assertTrue(2 <= self.dieset_2d4.roll() <= 8)
-
-    def test_DieSet_6d1_roll(self):
         self.assertEqual(self.dieset_6d1.roll(), 6)
 
-    def test_DieSet_1d6_maxroll(self):
+    def test_DieSet_maxroll(self):
         self.assertEqual(self.dieset_1d6.maxroll, 6)
-
-    def test_DieSet_2d4_maxroll(self):
         self.assertEqual(self.dieset_2d4.maxroll, 8)
-
-    def test_DieSet_6d1_maxroll(self):
         self.assertEqual(self.dieset_6d1.maxroll, 6)
 
-    def test_DieSet_1d6_minroll(self):
+    def test_DieSet_minroll(self):
         self.assertEqual(self.dieset_1d6.minroll, 1)
-
-    def test_DieSet_2d4_minroll(self):
         self.assertEqual(self.dieset_2d4.minroll, 2)
-
-    def test_DieSet_6d1_minroll(self):
         self.assertEqual(self.dieset_6d1.minroll, 6)
 
     def test_DieSet_probabilities(self):

@@ -74,26 +74,26 @@ class TestDstringParser(unittest.TestCase):
 
     def test_dstring_tokenize_xdx_plus_xdx(self):
         self.assertEqual(dice.dstring_parse("1d10+1d8"),
-                         [dice.DieSet("1d10"), "+", dice.DieSet("1d8")])
+                         [dice.DieSet("1d10"), dice.DieSet("1d8")])
 
     def test_dstring_tokenize_xdx_minus_xdx(self):
         self.assertEqual(dice.dstring_parse("1d20-1d4"),
-                         [dice.DieSet("1d20"), "-", dice.DieSet("1d4")])
+                         [dice.DieSet("1d20"), dice.DieSet("-1d4")])
 
     def test_dstring_tokenize_xdx_plus_xdx_plus_xdx(self):
         self.assertEqual(dice.dstring_parse("1d4+1d6+1d8"),
-                         [dice.DieSet("1d4"), "+", dice.DieSet("1d6"), "+",
+                         [dice.DieSet("1d4"), dice.DieSet("1d6"),
                           dice.DieSet("1d8")])
 
     def test_dstring_tokenize_xdx_minus_xdx_minus_xdx(self):
         self.assertEqual(dice.dstring_parse("1d4-1d6-1d8"),
-                         [dice.DieSet("1d4"), "-", dice.DieSet("1d6"), "-",
-                          dice.DieSet("1d8")])
+                         [dice.DieSet("1d4"), dice.DieSet("-1d6"),
+                          dice.DieSet("-1d8")])
 
     def test_dstring_tokenize_xdx_plus_xdx_minus_xdx(self):
         self.assertEqual(dice.dstring_parse("1d4+1d6-1d8"),
-                         [dice.DieSet("1d4"), "+", dice.DieSet("1d6"), "-",
-                          dice.DieSet("1d8")])
+                         [dice.DieSet("1d4"), dice.DieSet("1d6"),
+                          dice.DieSet("-1d8")])
 
 
 class TestDiceRoll(unittest.TestCase):

@@ -169,33 +169,26 @@ def dstring_tokenize(dice_string):
 def dstring_parse(dice_string):
     d_list = []
     d_tokens = dstring_tokenize(dice_string)
+    negative = False
     for token in d_tokens:
+        if token == "-":
+            negative = True
         if re.search("^\d+$", token):
+            if negative:
+                token = f"-{token}"
+                negative = False
             d_list.append(DieSet(f"{token}d1"))
         elif token != "+" and token != "-":
+            if negative:
+                token = f"-{token}"
+                negative = False
             d_list.append(DieSet(token))
-        else:
-            d_list.append(token)
     return d_list
 
 
 def roll(dice_string):
     d_tokens = dstring_parse(dice_string)
     total = 0
-    add = False
-    sub = False
     for token in d_tokens:
-        if token == "+":
-            add = True
-        elif token == "-":
-            sub = True
-        else:
-            if not add and not sub:
-                total += token.roll()
-            elif add:
-                add = False
-                total += token.roll()
-            elif sub:
-                sub = False
-                total -= token.roll()
+        total += token.roll()
     return total

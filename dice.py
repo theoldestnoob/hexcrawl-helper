@@ -12,10 +12,17 @@ from itertools import product
 
 class DieSet:
     def __init__(self, die_string):
-        if not re.search("^\d+d\d+$", die_string):
+        if not re.search("^-*\d+d\d+$", die_string):
             raise ValueError(f"Invalid die string {die_string}")
         self.dstring = die_string
-        num, sides = die_string.split("d")
+        num_str, sides_str = die_string.split("d")
+        num = int(num_str)
+        sides = int(sides_str)
+        if num < 0:
+            self.negative = True
+            num *= -1
+        else:
+            self.negative = False
         self.num = int(num)
         self.sides = int(sides)
         self.prob_list = None
@@ -36,15 +43,23 @@ class DieSet:
         else:
             for _ in range(self.num):
                 total += randint(1, self.sides)
+        if self.negative:
+            total *= -1
         return total
 
     @property
     def maxroll(self):
-        return self.num * self.sides
+        if self.negative:
+            return self.num * -1
+        else:
+            return self.num * self.sides
 
     @property
     def minroll(self):
-        return self.num
+        if self.negative:
+            return self.num * self.sides * -1
+        else:
+            return self.num
 
     @property
     def probabilities(self):
@@ -67,7 +82,10 @@ class DieSet:
         numerator_dict = {}
         for i in range(self.minroll, self.maxroll + 1):
             numerator_dict[i] = 0
-        allrolls = product(range(1, self.sides + 1), repeat=self.num)
+        if self.negative:
+            allrolls = product(range(self.sides * -1, 0, 1), repeat=self.num)
+        else:
+            allrolls = product(range(1, self.sides + 1), repeat=self.num)
         for roll in allrolls:
             numerator_dict[sum(roll)] += 1
         for result in range(self.minroll, self.maxroll + 1):

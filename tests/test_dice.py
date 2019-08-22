@@ -125,6 +125,7 @@ class TestDieSet(unittest.TestCase):
         self.dieset_2d4 = dice.DieSet("2d4")
         self.dieset_6d1 = dice.DieSet("6d1")
         self.dieset_3d3 = dice.DieSet("3d3")
+        self.dieset_neg1d6 = dice.DieSet("-1d6")
 
     def test_DieSet_invalid(self):
         with self.assertRaisesRegex(ValueError,
@@ -146,16 +147,19 @@ class TestDieSet(unittest.TestCase):
         self.assertTrue(1 <= self.dieset_1d6.roll() <= 6)
         self.assertTrue(2 <= self.dieset_2d4.roll() <= 8)
         self.assertEqual(self.dieset_6d1.roll(), 6)
+        self.assertTrue(-6 <= self.dieset_neg1d6.roll() <= -1)
 
     def test_DieSet_maxroll(self):
         self.assertEqual(self.dieset_1d6.maxroll, 6)
         self.assertEqual(self.dieset_2d4.maxroll, 8)
         self.assertEqual(self.dieset_6d1.maxroll, 6)
+        self.assertEqual(self.dieset_neg1d6.maxroll, -1)
 
     def test_DieSet_minroll(self):
         self.assertEqual(self.dieset_1d6.minroll, 1)
         self.assertEqual(self.dieset_2d4.minroll, 2)
         self.assertEqual(self.dieset_6d1.minroll, 6)
+        self.assertEqual(self.dieset_neg1d6.minroll, -6)
 
     def test_DieSet_probabilities(self):
         self.assertEqual(self.dieset_1d6.probabilities,
@@ -182,6 +186,13 @@ class TestDieSet(unittest.TestCase):
                           (7, 0.22222),
                           (8, 0.11111),
                           (9, 0.03704)])
+        self.assertEqual(self.dieset_neg1d6.probabilities,
+                         [(-6, 0.16667),
+                          (-5, 0.16667),
+                          (-4, 0.16667),
+                          (-3, 0.16667),
+                          (-2, 0.16667),
+                          (-1, 0.16667)])
 
     def test_DieSet_probability(self):
         self.assertEqual(self.dieset_1d6.probability(1), 0.16667)
@@ -190,6 +201,8 @@ class TestDieSet(unittest.TestCase):
         self.assertEqual(self.dieset_2d4.probability(6), 0.1875)
         self.assertEqual(self.dieset_6d1.probability(6), 1)
         self.assertEqual(self.dieset_6d1.probability(5), 0)
+        self.assertEqual(self.dieset_neg1d6.probability(3), 0)
+        self.assertEqual(self.dieset_neg1d6.probability(-3), 0.16667)
 
 
 class TestDieExpr(unittest.TestCase):

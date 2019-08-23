@@ -63,9 +63,13 @@ class DieSet:
             return self.num
 
     @property
-    def probabilities(self):
+    def rollrange(self):
+        return self.maxroll - self.minroll + 1
+
+    @property
+    def distribution(self):
         if self.prob_list is None:
-            self.prob_list = self._probabilities()
+            self.prob_list = self._distribution()
         return self.prob_list
 
     @property
@@ -85,12 +89,12 @@ class DieSet:
         if not self.minroll <= num <= self.maxroll:
             return 0
         else:
-            for roll, prob in self.probabilities:
+            for roll, prob in self.distribution:
                 if roll == num:
                     return prob
             return 0
 
-    def _probabilities(self):
+    def _distribution(self):
         results = []
         denominator = self.sides ** self.num
         numerator_dict = {}
@@ -135,9 +139,13 @@ class DieExpr:
         return total
 
     @property
-    def probabilities(self):
+    def rollrange(self):
+        return self.maxroll - self.minroll + 1
+
+    @property
+    def distribution(self):
         if self.prob_list is None:
-            self.prob_list = self._probabilities()
+            self.prob_list = self._distribution()
         return self.prob_list
 
     @property
@@ -157,12 +165,12 @@ class DieExpr:
         if not self.minroll <= num <= self.maxroll:
             return 0
         else:
-            for roll, prob in self.probabilities:
+            for roll, prob in self.distribution:
                 if roll == num:
                     return prob
             return 0
 
-    def _probabilities(self):
+    def _distribution(self):
         results = []
         denominator = len(self.all_rolls)
         numerator_dict = {}

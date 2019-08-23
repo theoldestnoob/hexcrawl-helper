@@ -162,15 +162,21 @@ class TestDieSet(unittest.TestCase):
         self.assertEqual(self.dieset_6d1.minroll, 6)
         self.assertEqual(self.dieset_neg1d6.minroll, -6)
 
-    def test_DieSet_probabilities(self):
-        self.assertEqual(self.dieset_1d6.probabilities,
+    def test_DieSet_rollrange(self):
+        self.assertEqual(self.dieset_1d6.rollrange, 6)
+        self.assertEqual(self.dieset_2d4.rollrange, 7)
+        self.assertEqual(self.dieset_6d1.rollrange, 1)
+        self.assertEqual(self.dieset_neg1d6.rollrange, 6)
+
+    def test_DieSet_distribution(self):
+        self.assertEqual(self.dieset_1d6.distribution,
                          [(1, 0.16667),
                           (2, 0.16667),
                           (3, 0.16667),
                           (4, 0.16667),
                           (5, 0.16667),
                           (6, 0.16667)])
-        self.assertEqual(self.dieset_2d4.probabilities,
+        self.assertEqual(self.dieset_2d4.distribution,
                          [(2, 0.0625),
                           (3, 0.125),
                           (4, 0.1875),
@@ -178,8 +184,8 @@ class TestDieSet(unittest.TestCase):
                           (6, 0.1875),
                           (7, 0.125),
                           (8, 0.0625)])
-        self.assertEqual(self.dieset_6d1.probabilities, [(6, 1)])
-        self.assertEqual(self.dieset_3d3.probabilities,
+        self.assertEqual(self.dieset_6d1.distribution, [(6, 1)])
+        self.assertEqual(self.dieset_3d3.distribution,
                          [(3, 0.03704),
                           (4, 0.11111),
                           (5, 0.22222),
@@ -187,7 +193,7 @@ class TestDieSet(unittest.TestCase):
                           (7, 0.22222),
                           (8, 0.11111),
                           (9, 0.03704)])
-        self.assertEqual(self.dieset_neg1d6.probabilities,
+        self.assertEqual(self.dieset_neg1d6.distribution,
                          [(-6, 0.16667),
                           (-5, 0.16667),
                           (-4, 0.16667),
@@ -252,15 +258,23 @@ class TestDieExpr(unittest.TestCase):
         self.assertEqual(self.dieexpr_1d10_m_2.maxroll, 8)
         self.assertEqual(self.dieexpr_1d8_1d10_1d4_m_2.maxroll, 20)
 
-    def test_DieExpr_probabilities(self):
-        self.assertEqual(self.dieexpr_1d6.probabilities,
+    def test_DieSet_rollrange(self):
+        self.assertEqual(self.dieexpr_1d6.rollrange, 6)
+        self.assertEqual(self.dieexpr_2d4.rollrange, 7)
+        self.assertEqual(self.dieexpr_1d6_p_1d4.rollrange, 9)
+        self.assertEqual(self.dieexpr_1d6_m_1d4.rollrange, 9)
+        self.assertEqual(self.dieexpr_1d10_m_2.rollrange, 10)
+        self.assertEqual(self.dieexpr_1d8_1d10_1d4_m_2.rollrange, 20)
+
+    def test_DieExpr_distribution(self):
+        self.assertEqual(self.dieexpr_1d6.distribution,
                          [(1, 0.16667),
                           (2, 0.16667),
                           (3, 0.16667),
                           (4, 0.16667),
                           (5, 0.16667),
                           (6, 0.16667)])
-        self.assertEqual(self.dieexpr_2d4.probabilities,
+        self.assertEqual(self.dieexpr_2d4.distribution,
                          [(2, 0.0625),
                           (3, 0.125),
                           (4, 0.1875),
@@ -268,7 +282,7 @@ class TestDieExpr(unittest.TestCase):
                           (6, 0.1875),
                           (7, 0.125),
                           (8, 0.0625)])
-        self.assertEqual(self.dieexpr_1d6_p_1d4.probabilities,
+        self.assertEqual(self.dieexpr_1d6_p_1d4.distribution,
                          [(2, 0.04167),
                           (3, 0.08333),
                           (4, 0.125),
@@ -278,7 +292,7 @@ class TestDieExpr(unittest.TestCase):
                           (8, 0.125),
                           (9, 0.08333),
                           (10, 0.04167)])
-        self.assertEqual(self.dieexpr_1d6_m_1d4.probabilities,
+        self.assertEqual(self.dieexpr_1d6_m_1d4.distribution,
                          [(-3, 0.04167),
                           (-2, 0.08333),
                           (-1, 0.125),
@@ -288,7 +302,7 @@ class TestDieExpr(unittest.TestCase):
                           (3, 0.125),
                           (4, 0.08333),
                           (5, 0.04167)])
-        self.assertEqual(self.dieexpr_1d10_m_2.probabilities,
+        self.assertEqual(self.dieexpr_1d10_m_2.distribution,
                          [(-1, 0.1),
                           (0, 0.1),
                           (1, 0.1),
@@ -299,7 +313,7 @@ class TestDieExpr(unittest.TestCase):
                           (6, 0.1),
                           (7, 0.1),
                           (8, 0.1)])
-        self.assertEqual(self.dieexpr_1d8_1d10_1d4_m_2.probabilities,
+        self.assertEqual(self.dieexpr_1d8_1d10_1d4_m_2.distribution,
                          [(1, 0.00313),
                           (2, 0.00937),
                           (3, 0.01875),

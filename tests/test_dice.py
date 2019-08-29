@@ -119,64 +119,116 @@ class TestDiceRoll(unittest.TestCase):
 
 class TestDieSet(unittest.TestCase):
 
-    def setUp(self):
-        self.dieset_1d6 = dice.DieSet("1d6")
-        self.dieset_1d6_b = dice.DieSet("1d6")
-        self.dieset_2d4 = dice.DieSet("2d4")
-        self.dieset_6d1 = dice.DieSet("6d1")
-        self.dieset_3d3 = dice.DieSet("3d3")
-        self.dieset_neg1d6 = dice.DieSet("-1d6")
-
-    def test_DieSet_invalid(self):
+    def test_DieSet_invalid_1d6_p_2(self):
         with self.assertRaisesRegex(ValueError,
                                     "Invalid die string .*"):
             dice.DieSet("1d6+2")
+
+    def test_DieSet_invalid_1d6_p_1d4(self):
+        with self.assertRaisesRegex(ValueError,
+                                    "Invalid die string .*"):
             dice.DieSet("1d6+1d4")
+
+    def test_DieSet_invalid_1s8(self):
+        with self.assertRaisesRegex(ValueError,
+                                    "Invalid die string .*"):
             dice.DieSet("1s8")
 
     def test_DieSet_repr(self):
-        self.assertEqual(self.dieset_1d6.__repr__(), "DieSet('1d6')")
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.__repr__(), "DieSet('1d6')")
 
     def test_DieSet_eq(self):
-        self.assertEqual(self.dieset_1d6, self.dieset_1d6_b)
+        dieset_1d6 = dice.DieSet("1d6")
+        dieset_1d6_b = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6, dieset_1d6_b)
 
     def test_DieSet_neq(self):
-        self.assertNotEqual(self.dieset_1d6, self.dieset_2d4)
+        dieset_1d6 = dice.DieSet("1d6")
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertNotEqual(dieset_1d6, dieset_2d4)
 
-    def test_DieSet_roll(self):
+    def test_DieSet_roll_1d6(self):
+        dieset_1d6 = dice.DieSet("1d6")
         for _ in range(1000):
-            self.assertTrue(1 <= self.dieset_1d6.roll() <= 6)
-            self.assertTrue(2 <= self.dieset_2d4.roll() <= 8)
-            self.assertEqual(self.dieset_6d1.roll(), 6)
-            self.assertTrue(-6 <= self.dieset_neg1d6.roll() <= -1)
+            self.assertTrue(1 <= dieset_1d6.roll() <= 6)
 
-    def test_DieSet_maxroll(self):
-        self.assertEqual(self.dieset_1d6.maxroll, 6)
-        self.assertEqual(self.dieset_2d4.maxroll, 8)
-        self.assertEqual(self.dieset_6d1.maxroll, 6)
-        self.assertEqual(self.dieset_neg1d6.maxroll, -1)
+    def test_DieSet_roll_2d4(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        for _ in range(1000):
+            self.assertTrue(2 <= dieset_2d4.roll() <= 8)
 
-    def test_DieSet_minroll(self):
-        self.assertEqual(self.dieset_1d6.minroll, 1)
-        self.assertEqual(self.dieset_2d4.minroll, 2)
-        self.assertEqual(self.dieset_6d1.minroll, 6)
-        self.assertEqual(self.dieset_neg1d6.minroll, -6)
+    def test_DieSet_roll_6d1(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        for _ in range(1000):
+            self.assertEqual(dieset_6d1.roll(), 6)
 
-    def test_DieSet_rollrange(self):
-        self.assertEqual(self.dieset_1d6.rollrange, 6)
-        self.assertEqual(self.dieset_2d4.rollrange, 7)
-        self.assertEqual(self.dieset_6d1.rollrange, 1)
-        self.assertEqual(self.dieset_neg1d6.rollrange, 6)
+    def test_DieSet_roll_neg1d6(self):
+        dieset_neg1d6 = dice.DieSet("-1d6")
+        for _ in range(1000):
+            self.assertTrue(-6 <= dieset_neg1d6.roll() <= -1)
 
-    def test_DieSet_distribution(self):
-        self.assertEqual(self.dieset_1d6.distribution,
+    def test_DieSet_maxroll_1d6(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.maxroll, 6)
+
+    def test_DieSet_maxroll_2d4(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertEqual(dieset_2d4.maxroll, 8)
+
+    def test_DieSet_maxroll_6d1(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        self.assertEqual(dieset_6d1.maxroll, 6)
+
+    def test_DieSet_maxroll_neg1d6(self):
+        dieset_neg1d6 = dice.DieSet("-1d6")
+        self.assertEqual(dieset_neg1d6.maxroll, -1)
+
+    def test_DieSet_minroll_1d6(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.minroll, 1)
+
+    def test_DieSet_minroll_2d4(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertEqual(dieset_2d4.minroll, 2)
+
+    def test_DieSet_minroll_6d1(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        self.assertEqual(dieset_6d1.minroll, 6)
+
+    def test_DieSet_minroll_neg1d6(self):
+        dieset_neg1d6 = dice.DieSet("-1d6")
+        self.assertEqual(dieset_neg1d6.minroll, -6)
+
+    def test_DieSet_rollrange_1d6(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.rollrange, 6)
+
+    def test_DieSet_rollrange_2d4(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertEqual(dieset_2d4.rollrange, 7)
+
+    def test_DieSet_rollrange_6d1(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        self.assertEqual(dieset_6d1.rollrange, 1)
+
+    def test_DieSet_rollrange_neg1d6(self):
+        dieset_neg1d6 = dice.DieSet("-1d6")
+        self.assertEqual(dieset_neg1d6.rollrange, 6)
+
+    def test_DieSet_distribution_1d6(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.distribution,
                          [(1, 0.16667),
                           (2, 0.16667),
                           (3, 0.16667),
                           (4, 0.16667),
                           (5, 0.16667),
                           (6, 0.16667)])
-        self.assertEqual(self.dieset_2d4.distribution,
+
+    def test_DieSet_distribution_2d4(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertEqual(dieset_2d4.distribution,
                          [(2, 0.0625),
                           (3, 0.125),
                           (4, 0.1875),
@@ -184,8 +236,14 @@ class TestDieSet(unittest.TestCase):
                           (6, 0.1875),
                           (7, 0.125),
                           (8, 0.0625)])
-        self.assertEqual(self.dieset_6d1.distribution, [(6, 1)])
-        self.assertEqual(self.dieset_3d3.distribution,
+
+    def test_DieSet_distribution_6d1(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        self.assertEqual(dieset_6d1.distribution, [(6, 1)])
+
+    def test_DieSet_distribution_3d3(self):
+        dieset_3d3 = dice.DieSet("3d3")
+        self.assertEqual(dieset_3d3.distribution,
                          [(3, 0.03704),
                           (4, 0.11111),
                           (5, 0.22222),
@@ -193,7 +251,10 @@ class TestDieSet(unittest.TestCase):
                           (7, 0.22222),
                           (8, 0.11111),
                           (9, 0.03704)])
-        self.assertEqual(self.dieset_neg1d6.distribution,
+
+    def test_DieSet_distribution_neg1d6(self):
+        dieset_neg1d6 = dice.DieSet("-1d6")
+        self.assertEqual(dieset_neg1d6.distribution,
                          [(-6, 0.16667),
                           (-5, 0.16667),
                           (-4, 0.16667),
@@ -201,17 +262,40 @@ class TestDieSet(unittest.TestCase):
                           (-2, 0.16667),
                           (-1, 0.16667)])
 
-    def test_DieSet_probability(self):
-        self.assertEqual(self.dieset_1d6.probability(1), 0.16667)
-        self.assertEqual(self.dieset_1d6.probability(7), 0)
-        self.assertEqual(self.dieset_2d4.probability(2), 0.0625)
-        self.assertEqual(self.dieset_2d4.probability(6), 0.1875)
-        self.assertEqual(self.dieset_6d1.probability(6), 1)
-        self.assertEqual(self.dieset_6d1.probability(5), 0)
-        self.assertEqual(self.dieset_neg1d6.probability(3), 0)
-        self.assertEqual(self.dieset_neg1d6.probability(-3), 0.16667)
+    def test_DieSet_probability_1d6_1(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.probability(1), 0.16667)
+
+    def test_DieSet_probability_1d6_7(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.probability(7), 0)
+
+    def test_DieSet_probability_2d4_2(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertEqual(dieset_2d4.probability(2), 0.0625)
+
+    def test_DieSet_probability_2d4_6(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertEqual(dieset_2d4.probability(6), 0.1875)
+
+    def test_DieSet_probability_6d1_6(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        self.assertEqual(dieset_6d1.probability(6), 1)
+
+    def test_DieSet_probability_6d1_5(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        self.assertEqual(dieset_6d1.probability(5), 0)
+
+    def test_DieSet_probability_neg1d6_3(self):
+        dieset_neg1d6 = dice.DieSet("-1d6")
+        self.assertEqual(dieset_neg1d6.probability(3), 0)
+
+    def test_DieSet_probability_neg1d6_neg3(self):
+        dieset_neg1d6 = dice.DieSet("-1d6")
+        self.assertEqual(dieset_neg1d6.probability(-3), 0.16667)
 
 
+# TODO: break all into separate tests
 class TestDieExpr(unittest.TestCase):
 
     def setUp(self):

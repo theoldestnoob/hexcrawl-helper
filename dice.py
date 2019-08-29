@@ -185,6 +185,7 @@ class DieExpr:
 
 
 def dstring_tokenize(dice_string):
+    # TODO: allow whitespace in input, strip from results
     # check for invalid string
     invalid_token = re.search("[^-+d\d]", dice_string)
     if invalid_token is not None:

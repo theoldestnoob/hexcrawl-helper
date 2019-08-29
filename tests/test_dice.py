@@ -295,70 +295,150 @@ class TestDieSet(unittest.TestCase):
         self.assertEqual(dieset_neg1d6.probability(-3), 0.16667)
 
 
-# TODO: break all into separate tests
 class TestDieExpr(unittest.TestCase):
 
-    def setUp(self):
-        self.dieexpr_1d6 = dice.DieExpr("1d6")
-        self.dieexpr_2d4 = dice.DieExpr("2d4")
-        self.dieexpr_1d6_p_1d4 = dice.DieExpr("1d6+1d4")
-        self.dieexpr_1d6_m_1d4 = dice.DieExpr("1d6-1d4")
-        self.dieexpr_1d10_m_2 = dice.DieExpr("1d10-2")
-        self.dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
+    def test_DieExpr_repr_1d6(self):
+        dieexpr_1d6 = dice.DieExpr("1d6")
+        self.assertEqual(dieexpr_1d6.__repr__(), "DieExpr('1d6')")
 
-    def test_DieExpr_repr(self):
-        self.assertEqual(self.dieexpr_1d6.__repr__(), "DieExpr('1d6')")
-        self.assertEqual(self.dieexpr_2d4.__repr__(), "DieExpr('2d4')")
-        self.assertEqual(self.dieexpr_1d6_p_1d4.__repr__(),
+    def test_DieExpr_repr_2d4(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        self.assertEqual(dieexpr_2d4.__repr__(), "DieExpr('2d4')")
+
+    def test_DieExpr_repr_1d6_p_1d4(self):
+        dieexpr_1d6_p_1d4 = dice.DieExpr("1d6+1d4")
+        self.assertEqual(dieexpr_1d6_p_1d4.__repr__(),
                          "DieExpr('1d6+1d4')")
-        self.assertEqual(self.dieexpr_1d6_m_1d4.__repr__(),
+
+    def test_DieExpr_repr_1d6_m_1d4(self):
+        dieexpr_1d6_m_1d4 = dice.DieExpr("1d6-1d4")
+        self.assertEqual(dieexpr_1d6_m_1d4.__repr__(),
                          "DieExpr('1d6-1d4')")
-        self.assertEqual(self.dieexpr_1d10_m_2.__repr__(), "DieExpr('1d10-2')")
-        self.assertEqual(self.dieexpr_1d8_1d10_1d4_m_2.__repr__(),
+
+    def test_DieExpr_repr_1d10_m_2(self):
+        dieexpr_1d10_m_2 = dice.DieExpr("1d10-2")
+        self.assertEqual(dieexpr_1d10_m_2.__repr__(), "DieExpr('1d10-2')")
+
+    def test_DieExpr_repr_1d8_1d10_1d4_m_2(self):
+        dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
+        self.assertEqual(dieexpr_1d8_1d10_1d4_m_2.__repr__(),
                          "DieExpr('1d8+1d10+1d4-2')")
 
-    def test_DieExpr_roll(self):
+    def test_DieExpr_roll_1d6(self):
+        dieexpr_1d6 = dice.DieExpr("1d6")
         for _ in range(1000):
-            self.assertTrue(1 <= self.dieexpr_1d6.roll() <= 6)
-            self.assertTrue(2 <= self.dieexpr_2d4.roll() <= 8)
-            self.assertTrue(2 <= self.dieexpr_1d6_p_1d4.roll() <= 10)
-            self.assertTrue(-3 <= self.dieexpr_1d6_m_1d4.roll() <= 5)
-            self.assertTrue(-1 <= self.dieexpr_1d10_m_2.roll() <= 8)
-            self.assertTrue(1 <= self.dieexpr_1d8_1d10_1d4_m_2.roll() <= 20)
+            self.assertTrue(1 <= dieexpr_1d6.roll() <= 6)
 
-    def test_DieExpr_minroll(self):
-        self.assertEqual(self.dieexpr_1d6.minroll, 1)
-        self.assertEqual(self.dieexpr_2d4.minroll, 2)
-        self.assertEqual(self.dieexpr_1d6_p_1d4.minroll, 2)
-        self.assertEqual(self.dieexpr_1d6_m_1d4.minroll, -3)
-        self.assertEqual(self.dieexpr_1d10_m_2.minroll, -1)
-        self.assertEqual(self.dieexpr_1d8_1d10_1d4_m_2.minroll, 1)
+    def test_DieExpr_roll_2d4(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        for _ in range(1000):
+            self.assertTrue(2 <= dieexpr_2d4.roll() <= 8)
 
-    def test_DieExpr_maxroll(self):
-        self.assertEqual(self.dieexpr_1d6.maxroll, 6)
-        self.assertEqual(self.dieexpr_2d4.maxroll, 8)
-        self.assertEqual(self.dieexpr_1d6_p_1d4.maxroll, 10)
-        self.assertEqual(self.dieexpr_1d6_m_1d4.maxroll, 5)
-        self.assertEqual(self.dieexpr_1d10_m_2.maxroll, 8)
-        self.assertEqual(self.dieexpr_1d8_1d10_1d4_m_2.maxroll, 20)
+    def test_DieExpr_roll_1d6_p_1d4(self):
+        dieexpr_1d6_p_1d4 = dice.DieExpr("1d6+1d4")
+        for _ in range(1000):
+            self.assertTrue(2 <= dieexpr_1d6_p_1d4.roll() <= 10)
 
-    def test_DieSet_rollrange(self):
-        self.assertEqual(self.dieexpr_1d6.rollrange, 6)
-        self.assertEqual(self.dieexpr_2d4.rollrange, 7)
-        self.assertEqual(self.dieexpr_1d6_p_1d4.rollrange, 9)
-        self.assertEqual(self.dieexpr_1d6_m_1d4.rollrange, 9)
-        self.assertEqual(self.dieexpr_1d10_m_2.rollrange, 10)
-        self.assertEqual(self.dieexpr_1d8_1d10_1d4_m_2.rollrange, 20)
+    def test_DieExpr_roll_1d6_m_1d4(self):
+        dieexpr_1d6_m_1d4 = dice.DieExpr("1d6-1d4")
+        for _ in range(1000):
+            self.assertTrue(-3 <= dieexpr_1d6_m_1d4.roll() <= 5)
 
-    def test_DieExpr_distribution(self):
-        self.assertEqual(self.dieexpr_1d6.distribution,
+    def test_DieExpr_roll_1d10_m_2(self):
+        dieexpr_1d10_m_2 = dice.DieExpr("1d10-2")
+        for _ in range(1000):
+            self.assertTrue(-1 <= dieexpr_1d10_m_2.roll() <= 8)
+
+    def test_DieExpr_roll_1d8_1d10_1d4_m_2(self):
+        dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
+        for _ in range(1000):
+            self.assertTrue(1 <= dieexpr_1d8_1d10_1d4_m_2.roll() <= 20)
+
+    def test_DieExpr_minroll_1d6(self):
+        dieexpr_1d6 = dice.DieExpr("1d6")
+        self.assertEqual(dieexpr_1d6.minroll, 1)
+
+    def test_DieExpr_minroll_2d4(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        self.assertEqual(dieexpr_2d4.minroll, 2)
+
+    def test_DieExpr_minroll_1d6_p_1d4(self):
+        dieexpr_1d6_p_1d4 = dice.DieExpr("1d6+1d4")
+        self.assertEqual(dieexpr_1d6_p_1d4.minroll, 2)
+
+    def test_DieExpr_minroll_1d6_m_1d4(self):
+        dieexpr_1d6_m_1d4 = dice.DieExpr("1d6-1d4")
+        self.assertEqual(dieexpr_1d6_m_1d4.minroll, -3)
+
+    def test_DieExpr_minroll_1d10_m_2(self):
+        dieexpr_1d10_m_2 = dice.DieExpr("1d10-2")
+        self.assertEqual(dieexpr_1d10_m_2.minroll, -1)
+
+    def test_DieExpr_minroll_1d8_1d10_1d4_m_2(self):
+        dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
+        self.assertEqual(dieexpr_1d8_1d10_1d4_m_2.minroll, 1)
+
+    def test_DieExpr_maxroll_1d6(self):
+        dieexpr_1d6 = dice.DieExpr("1d6")
+        self.assertEqual(dieexpr_1d6.maxroll, 6)
+
+    def test_DieExpr_maxroll_2d4(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        self.assertEqual(dieexpr_2d4.maxroll, 8)
+
+    def test_DieExpr_maxroll_1d6_p_1d4(self):
+        dieexpr_1d6_p_1d4 = dice.DieExpr("1d6+1d4")
+        self.assertEqual(dieexpr_1d6_p_1d4.maxroll, 10)
+
+    def test_DieExpr_maxroll_1d6_m_1d4(self):
+        dieexpr_1d6_m_1d4 = dice.DieExpr("1d6-1d4")
+        self.assertEqual(dieexpr_1d6_m_1d4.maxroll, 5)
+
+    def test_DieExpr_maxroll_1d10_m_2(self):
+        dieexpr_1d10_m_2 = dice.DieExpr("1d10-2")
+        self.assertEqual(dieexpr_1d10_m_2.maxroll, 8)
+
+    def test_DieExpr_maxroll_1d8_1d10_1d4_m_2(self):
+        dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
+        self.assertEqual(dieexpr_1d8_1d10_1d4_m_2.maxroll, 20)
+
+    def test_DieSet_rollrange_1d6(self):
+        dieexpr_1d6 = dice.DieExpr("1d6")
+        self.assertEqual(dieexpr_1d6.rollrange, 6)
+
+    def test_DieSet_rollrange_2d4(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        self.assertEqual(dieexpr_2d4.rollrange, 7)
+
+    def test_DieSet_rollrange_1d6_p_1d4(self):
+        dieexpr_1d6_p_1d4 = dice.DieExpr("1d6+1d4")
+        self.assertEqual(dieexpr_1d6_p_1d4.rollrange, 9)
+
+    def test_DieSet_rollrange_1d6_m_1d4(self):
+        dieexpr_1d6_m_1d4 = dice.DieExpr("1d6-1d4")
+        self.assertEqual(dieexpr_1d6_m_1d4.rollrange, 9)
+
+    def test_DieSet_rollrange_1d10_m_2(self):
+        dieexpr_1d10_m_2 = dice.DieExpr("1d10-2")
+        self.assertEqual(dieexpr_1d10_m_2.rollrange, 10)
+
+    def test_DieSet_rollrange_1d8_1d10_1d4_m_2(self):
+        dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
+        self.assertEqual(dieexpr_1d8_1d10_1d4_m_2.rollrange, 20)
+
+    def test_DieExpr_distribution_1d6(self):
+        dieexpr_1d6 = dice.DieExpr("1d6")
+        self.assertEqual(dieexpr_1d6.distribution,
                          [(1, 0.16667),
                           (2, 0.16667),
                           (3, 0.16667),
                           (4, 0.16667),
                           (5, 0.16667),
                           (6, 0.16667)])
-        self.assertEqual(self.dieexpr_2d4.distribution,
+
+    def test_DieExpr_distribution_2d4(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        self.assertEqual(dieexpr_2d4.distribution,
                          [(2, 0.0625),
                           (3, 0.125),
                           (4, 0.1875),
@@ -366,7 +446,10 @@ class TestDieExpr(unittest.TestCase):
                           (6, 0.1875),
                           (7, 0.125),
                           (8, 0.0625)])
-        self.assertEqual(self.dieexpr_1d6_p_1d4.distribution,
+
+    def test_DieExpr_distribution_1d6_p_1d4(self):
+        dieexpr_1d6_p_1d4 = dice.DieExpr("1d6+1d4")
+        self.assertEqual(dieexpr_1d6_p_1d4.distribution,
                          [(2, 0.04167),
                           (3, 0.08333),
                           (4, 0.125),
@@ -376,7 +459,10 @@ class TestDieExpr(unittest.TestCase):
                           (8, 0.125),
                           (9, 0.08333),
                           (10, 0.04167)])
-        self.assertEqual(self.dieexpr_1d6_m_1d4.distribution,
+
+    def test_DieExpr_distribution_1d6_m_1d4(self):
+        dieexpr_1d6_m_1d4 = dice.DieExpr("1d6-1d4")
+        self.assertEqual(dieexpr_1d6_m_1d4.distribution,
                          [(-3, 0.04167),
                           (-2, 0.08333),
                           (-1, 0.125),
@@ -386,7 +472,10 @@ class TestDieExpr(unittest.TestCase):
                           (3, 0.125),
                           (4, 0.08333),
                           (5, 0.04167)])
-        self.assertEqual(self.dieexpr_1d10_m_2.distribution,
+
+    def test_DieExpr_distribution_1d10_m_2(self):
+        dieexpr_1d10_m_2 = dice.DieExpr("1d10-2")
+        self.assertEqual(dieexpr_1d10_m_2.distribution,
                          [(-1, 0.1),
                           (0, 0.1),
                           (1, 0.1),
@@ -397,7 +486,10 @@ class TestDieExpr(unittest.TestCase):
                           (6, 0.1),
                           (7, 0.1),
                           (8, 0.1)])
-        self.assertEqual(self.dieexpr_1d8_1d10_1d4_m_2.distribution,
+
+    def test_DieExpr_distribution_1d8_1d10_1d4_m_2(self):
+        dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
+        self.assertEqual(dieexpr_1d8_1d10_1d4_m_2.distribution,
                          [(1, 0.00313),
                           (2, 0.00937),
                           (3, 0.01875),
@@ -419,15 +511,37 @@ class TestDieExpr(unittest.TestCase):
                           (19, 0.00937),
                           (20, 0.00313)])
 
-    def test_DieExpr_probability(self):
-        self.assertEqual(self.dieexpr_1d6.probability(1), 0.16667)
-        self.assertEqual(self.dieexpr_1d6.probability(7), 0)
-        self.assertEqual(self.dieexpr_2d4.probability(2), 0.0625)
-        self.assertEqual(self.dieexpr_2d4.probability(6), 0.1875)
-        self.assertEqual(self.dieexpr_1d6_p_1d4.probability(4), 0.125)
-        self.assertEqual(self.dieexpr_1d6_m_1d4.probability(-4), 0)
-        self.assertEqual(self.dieexpr_1d10_m_2.probability(0), 0.1)
-        self.assertEqual(self.dieexpr_1d8_1d10_1d4_m_2.probability(9), 0.09062)
+    def test_DieExpr_probability_1d6_1(self):
+        dieexpr_1d6 = dice.DieExpr("1d6")
+        self.assertEqual(dieexpr_1d6.probability(1), 0.16667)
+
+    def test_DieExpr_probability_1d6_7(self):
+        dieexpr_1d6 = dice.DieExpr("1d6")
+        self.assertEqual(dieexpr_1d6.probability(7), 0)
+
+    def test_DieExpr_probability_2d4_2(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        self.assertEqual(dieexpr_2d4.probability(2), 0.0625)
+
+    def test_DieExpr_probability_2d4_6(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        self.assertEqual(dieexpr_2d4.probability(6), 0.1875)
+
+    def test_DieExpr_probability_1d6_p_1d4_4(self):
+        dieexpr_1d6_p_1d4 = dice.DieExpr("1d6+1d4")
+        self.assertEqual(dieexpr_1d6_p_1d4.probability(4), 0.125)
+
+    def test_DieExpr_probability_1d6_m_1d4_neg4(self):
+        dieexpr_1d6_m_1d4 = dice.DieExpr("1d6-1d4")
+        self.assertEqual(dieexpr_1d6_m_1d4.probability(-4), 0)
+
+    def test_DieExpr_probability_1d10_m_2_0(self):
+        dieexpr_1d10_m_2 = dice.DieExpr("1d10-2")
+        self.assertEqual(dieexpr_1d10_m_2.probability(0), 0.1)
+
+    def test_DieExpr_probability_1d8_1d10_1d4_m_2_9(self):
+        dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
+        self.assertEqual(dieexpr_1d8_1d10_1d4_m_2.probability(9), 0.09062)
 
 
 if __name__ == "__main__":

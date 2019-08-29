@@ -12,7 +12,7 @@ from itertools import product, chain
 
 class DieSet:
     def __init__(self, die_string):
-        if not re.search("^-*\d+d\d+$", die_string):
+        if not re.search(r"^-*\d+d\d+$", die_string):
             raise ValueError(f"Invalid die string {die_string}")
         self.dstring = die_string
         num_str, sides_str = die_string.split("d")
@@ -110,7 +110,7 @@ class DieSet:
 
 class DieExpr:
     def __init__(self, dice_string):
-        self.dstring = re.sub("\s", "", dice_string)
+        self.dstring = re.sub(r"\s", "", dice_string)
         self.diesets = dstring_parse(dice_string)
         self.prob_list = None
         self._all_rolls = None
@@ -186,18 +186,18 @@ class DieExpr:
 
 def dstring_tokenize(dice_string):
     # check for invalid string
-    invalid_token = re.search("[^-+d\d\s]", dice_string)
+    invalid_token = re.search(r"[^-+d\d\s]", dice_string)
     if invalid_token is not None:
         raise ValueError(f"Invalid character '{invalid_token.group()}' in '{dice_string}'")
     # strip whitespace
-    dice_string = re.sub("\s", "", dice_string)
+    dice_string = re.sub(r"\s", "", dice_string)
     # split into tokens
     d_tokens = re.split("([+-])", dice_string)
     for token in d_tokens:
         if token == "":
             raise ValueError(f"Invalid token in {dice_string}, check operators")
         else:
-            valid_token = re.search("^(\d+d\d+|[+-]|\d+)$", token)
+            valid_token = re.search(r"^(\d+d\d+|[+-]|\d+)$", token)
             if valid_token is None:
                 raise ValueError(f"Invalid token '{token}' in {dice_string}")
     return d_tokens
@@ -210,7 +210,7 @@ def dstring_parse(dice_string):
     for token in d_tokens:
         if token == "-":
             negative = True
-        if re.search("^\d+$", token):
+        if re.search(r"^\d+$", token):
             if negative:
                 token = f"-{token}"
                 negative = False

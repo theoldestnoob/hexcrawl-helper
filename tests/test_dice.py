@@ -48,7 +48,7 @@ class TestDstringTokenizer(unittest.TestCase):
 
     def test_dstring_tokenize_invalid_token_too_many_d(self):
         with self.assertRaisesRegex(ValueError,
-                                    "Invalid token .* in .*"):
+                                    "Invalid token '.*' in .*"):
             dice.dstring_tokenize("1dd6")
 
     def test_dstring_tokenize_invalid_token_too_many_minus(self):
@@ -65,6 +65,12 @@ class TestDstringTokenizer(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,
                                     "Invalid token in .*, check operators"):
             dice.dstring_tokenize("1d6+-1d6")
+
+    def test_dstring_tokenize_whitespace_1d6_1(self):
+        self.assertEqual(dice.dstring_tokenize("1d6 + 1"), ["1d6", "+", "1"])
+
+    def test_dstring_tokenize_whitespace_1d6_2(self):
+        self.assertEqual(dice.dstring_tokenize("1d6  +2"), ["1d6", "+", "2"])
 
 
 class TestDstringParser(unittest.TestCase):
@@ -323,6 +329,11 @@ class TestDieExpr(unittest.TestCase):
         dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
         self.assertEqual(dieexpr_1d8_1d10_1d4_m_2.__repr__(),
                          "DieExpr('1d8+1d10+1d4-2')")
+
+    def test_DieExpr_repr_whitespace(self):
+        dieexpr_1d6_p_1d4 = dice.DieExpr("1 d6  +   1d  4")
+        self.assertEqual(dieexpr_1d6_p_1d4.__repr__(),
+                         "DieExpr('1d6+1d4')")
 
     def test_DieExpr_roll_1d6(self):
         dieexpr_1d6 = dice.DieExpr("1d6")

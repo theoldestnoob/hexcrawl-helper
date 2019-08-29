@@ -110,7 +110,7 @@ class DieSet:
 
 class DieExpr:
     def __init__(self, dice_string):
-        self.dstring = dice_string
+        self.dstring = re.sub("\s", "", dice_string)
         self.diesets = dstring_parse(dice_string)
         self.prob_list = None
         self._all_rolls = None
@@ -185,11 +185,13 @@ class DieExpr:
 
 
 def dstring_tokenize(dice_string):
-    # TODO: allow whitespace in input, strip from results
     # check for invalid string
-    invalid_token = re.search("[^-+d\d]", dice_string)
+    invalid_token = re.search("[^-+d\d\s]", dice_string)
     if invalid_token is not None:
         raise ValueError(f"Invalid character '{invalid_token.group()}' in '{dice_string}'")
+    # strip whitespace
+    dice_string = re.sub("\s", "", dice_string)
+    # split into tokens
     d_tokens = re.split("([+-])", dice_string)
     for token in d_tokens:
         if token == "":
@@ -197,7 +199,7 @@ def dstring_tokenize(dice_string):
         else:
             valid_token = re.search("^(\d+d\d+|[+-]|\d+)$", token)
             if valid_token is None:
-                raise ValueError(f"Invalid token {token} in {dice_string}")
+                raise ValueError(f"Invalid token '{token}' in {dice_string}")
     return d_tokens
 
 

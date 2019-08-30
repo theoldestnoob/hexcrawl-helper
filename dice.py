@@ -7,7 +7,8 @@ Created on Wed Aug 21 19:29:51 2019
 
 import re
 from random import randint
-from itertools import product, chain
+from itertools import product
+from collections import Counter
 
 
 class DieSet:
@@ -26,7 +27,7 @@ class DieSet:
         self.num = int(num)
         self.sides = int(sides)
         self.prob_list = None
-        self._all_rolls = None
+        self._roll_counts = None
 
     def __repr__(self):
         return f"DieSet('{self.dstring}')"
@@ -73,17 +74,17 @@ class DieSet:
         return self.prob_list
 
     @property
-    def all_rolls(self):
-        if self._all_rolls is None:
+    def roll_counts(self):
+        if self._roll_counts is None:
             if self.negative:
                 allrolls = product(range(self.sides * -1, 0), repeat=self.num)
             else:
                 allrolls = product(range(1, self.sides + 1), repeat=self.num)
-            allrolls_lists = []
+            allrolls_dict = Counter()
             for roll in allrolls:
-                allrolls_lists.append(list(roll))
-            self._all_rolls = allrolls_lists
-        return self._all_rolls
+                allrolls_dict[sum(roll)] += 1
+            self._roll_counts = allrolls_dict
+        return self._roll_counts
 
     def probability(self, num):
         if not self.minroll <= num <= self.maxroll:
@@ -97,14 +98,9 @@ class DieSet:
     def _distribution(self):
         results = []
         denominator = self.sides ** self.num
-        numerator_dict = {}
-        for i in range(self.minroll, self.maxroll + 1):
-            numerator_dict[i] = 0
-        for roll in self.all_rolls:
-            numerator_dict[sum(roll)] += 1
         for result in range(self.minroll, self.maxroll + 1):
             results.append((result,
-                            round(numerator_dict[result] / denominator, 5)))
+                            round(self.roll_counts[result] / denominator, 5)))
         return results
 
 
@@ -113,7 +109,7 @@ class DieExpr:
         self.dstring = re.sub(r"\s", "", dice_string)
         self.diesets = dstring_parse(dice_string)
         self.prob_list = None
-        self._all_rolls = None
+        self._roll_counts = None
 
     def __repr__(self):
         return f"DieExpr('{self.dstring}')"
@@ -149,17 +145,31 @@ class DieExpr:
         return self.prob_list
 
     @property
-    def all_rolls(self):
-        if self._all_rolls is None:
-            setrolls = []
+    def roll_counts(self):
+        if self._roll_counts is None:
+            # get all of our sets' roll_counts dicts in a list
+            # as (key, value) tuples instead of {key: value} maps
+            set_roll_tuples = []
             for dieset in self.diesets:
-                setrolls.append(dieset.all_rolls)
-            allrolls = product(*setrolls)
-            allrolls_chains = []
-            for rolls in allrolls:
-                allrolls_chains.append(list(chain(*rolls)))
-            self._all_rolls = allrolls_chains
-        return self._all_rolls
+                set_roll_list = []
+                for key, value in dieset.roll_counts.items():
+                    set_roll_list.append((key, value))
+                set_roll_tuples.append(set_roll_list)
+            # get the product of our lists of tuples
+            product_list = product(*set_roll_tuples)
+            # get our roll_counts count:
+            # the sum of keys is the combined roll value
+            # the product (multiplication) of values is the total combinations
+            roll_count = Counter()
+            for roll_list in product_list:
+                totalsum = 0
+                totalprod = 1
+                for roll, count in roll_list:
+                    totalsum += roll
+                    totalprod *= count
+                roll_count[totalsum] += totalprod
+            self._roll_counts = roll_count
+        return self._roll_counts
 
     def probability(self, num):
         if not self.minroll <= num <= self.maxroll:
@@ -172,15 +182,12 @@ class DieExpr:
 
     def _distribution(self):
         results = []
-        denominator = len(self.all_rolls)
-        numerator_dict = {}
-        for i in range(self.minroll, self.maxroll + 1):
-            numerator_dict[i] = 0
-        for roll in self.all_rolls:
-            numerator_dict[sum(roll)] += 1
+        denominator = 0
+        for roll, count in self.roll_counts.items():
+            denominator += count
         for result in range(self.minroll, self.maxroll + 1):
             results.append((result,
-                            round(numerator_dict[result] / denominator, 5)))
+                            round(self.roll_counts[result] / denominator, 5)))
         return results
 
 
@@ -188,14 +195,16 @@ def dstring_tokenize(dice_string):
     # check for invalid string
     invalid_token = re.search(r"[^-+d\d\s]", dice_string)
     if invalid_token is not None:
-        raise ValueError(f"Invalid character '{invalid_token.group()}' in '{dice_string}'")
+        err = f"Invalid character '{invalid_token.group()}' in '{dice_string}'"
+        raise ValueError(err)
     # strip whitespace
     dice_string = re.sub(r"\s", "", dice_string)
     # split into tokens
     d_tokens = re.split("([+-])", dice_string)
     for token in d_tokens:
         if token == "":
-            raise ValueError(f"Invalid token in {dice_string}, check operators")
+            err = f"Invalid token in {dice_string}, check operators"
+            raise ValueError(err)
         else:
             valid_token = re.search(r"^(\d+d\d+|[+-]|\d+)$", token)
             if valid_token is None:

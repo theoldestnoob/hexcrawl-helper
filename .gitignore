@@ -89,10 +89,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-Include/
-Lib/
-Scripts/
-pyvenv.cfg
 
 # Spyder project settings
 .spyderproject
@@ -100,6 +96,10 @@ pyvenv.cfg
 
 # Rope project settings
 .ropeproject
+
+# VS Code workspace
+*code-workspace
+.vscode
 
 # mkdocs documentation
 /site

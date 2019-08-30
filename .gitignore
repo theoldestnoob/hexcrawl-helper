@@ -101,6 +101,10 @@ pyvenv.cfg
 # Rope project settings
 .ropeproject
 
+# VSCode workspace settings
+*code-workspace
+.vscode
+
 # mkdocs documentation
 /site
 

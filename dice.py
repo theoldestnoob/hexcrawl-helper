@@ -11,7 +11,29 @@ from itertools import product
 from collections import Counter
 
 
-class DieSet:
+class DieProbabilityRangeMixin:
+    def probability_range(self, low, high):
+        if low > high:
+            low, high = (high, low)
+        if low < self.minroll:
+            smin = self.minroll
+            smax = self.maxroll
+            errstr = f"Argument '{low}' not in valid range {smin} - {smax}"
+            raise ValueError(errstr)
+        elif high > self.maxroll:
+            smin = self.minroll
+            smax = self.maxroll
+            errstr = f"Argument '{high}' not in valid range {smin} - {smax}"
+            raise ValueError(errstr)
+        else:
+            prob = 0
+            for index, value in self.distribution:
+                if low <= index <= high:
+                    prob += value
+            return round(prob, 5)
+
+
+class DieSet(DieProbabilityRangeMixin):
     def __init__(self, die_string):
         if not re.search(r"^-*\d+d\d+$", die_string):
             raise ValueError(f"Invalid die string {die_string}")
@@ -95,26 +117,6 @@ class DieSet:
                     return prob
             return 0
 
-    def probability_range(self, low, high):
-        if low > high:
-            low, high = (high, low)
-        if low < self.minroll:
-            smin = self.minroll
-            smax = self.maxroll
-            errstr = f"Argument '{low}' not in valid range {smin} - {smax}"
-            raise ValueError(errstr)
-        elif high > self.maxroll:
-            smin = self.minroll
-            smax = self.maxroll
-            errstr = f"Argument '{low}' not in valid range {smin} - {smax}"
-            raise ValueError(errstr)
-        else:
-            prob = 0
-            for index, value in self.distribution:
-                if low <= index <= high:
-                    prob += value
-            return round(prob, 5)
-
     def _distribution(self):
         results = []
         denominator = self.sides ** self.num
@@ -124,7 +126,7 @@ class DieSet:
         return results
 
 
-class DieExpr:
+class DieExpr(DieProbabilityRangeMixin):
     def __init__(self, dice_string):
         self.dstring = re.sub(r"\s", "", dice_string)
         self.diesets = dstring_parse(dice_string)

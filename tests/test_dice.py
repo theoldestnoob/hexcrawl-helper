@@ -300,6 +300,48 @@ class TestDieSet(unittest.TestCase):
         dieset_neg1d6 = dice.DieSet("-1d6")
         self.assertEqual(dieset_neg1d6.probability(-3), 0.16667)
 
+    def test_DieSet_probability_range_1d6_1to3(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.probability_range(1, 3), 0.50001)
+
+    def test_DieSet_probability_range_1d6_4to5(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.probability_range(4, 5), 0.33334)
+
+    def test_DieSet_probability_range_2d4_2to4(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertEqual(dieset_2d4.probability_range(2, 4), 0.375)
+
+    def test_DieSet_probability_range_2d4_4to6(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertEqual(dieset_2d4.probability_range(4, 6), 0.625)
+
+    def test_DieSet_probability_range_neg1d6_neg4toneg3(self):
+        dieset_neg1d6 = dice.DieSet("-1d6")
+        self.assertEqual(dieset_neg1d6.probability_range(-4, -3), 0.33334)
+
+    def test_DieSet_probability_range_1d6_5to1(self):
+        dieset_neg1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_neg1d6.probability_range(5, 1), 0.83335)
+
+    def test_DieSet_probability_range_6d1_1to3(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        with self.assertRaisesRegex(ValueError,
+                                    "Argument '.*' not in valid range .*"):
+            dieset_6d1.probability_range(1, 3)
+
+    def test_DieSet_probability_range_6d1_5to6(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        with self.assertRaisesRegex(ValueError,
+                                    "Argument '.*' not in valid range .*"):
+            dieset_6d1.probability_range(5, 6)
+
+    def test_DieSet_probability_range_1d6_5to7(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        with self.assertRaisesRegex(ValueError,
+                                    "Argument '.*' not in valid range .*"):
+            dieset_1d6.probability_range(5, 7)
+
 
 class TestDieExpr(unittest.TestCase):
 

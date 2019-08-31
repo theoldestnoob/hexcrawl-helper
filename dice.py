@@ -95,6 +95,26 @@ class DieSet:
                     return prob
             return 0
 
+    def probability_range(self, low, high):
+        if low > high:
+            low, high = (high, low)
+        if low < self.minroll:
+            smin = self.minroll
+            smax = self.maxroll
+            errstr = f"Argument '{low}' not in valid range {smin} - {smax}"
+            raise ValueError(errstr)
+        elif high > self.maxroll:
+            smin = self.minroll
+            smax = self.maxroll
+            errstr = f"Argument '{low}' not in valid range {smin} - {smax}"
+            raise ValueError(errstr)
+        else:
+            prob = 0
+            for index, value in self.distribution:
+                if low <= index <= high:
+                    prob += value
+            return round(prob, 5)
+
     def _distribution(self):
         results = []
         denominator = self.sides ** self.num

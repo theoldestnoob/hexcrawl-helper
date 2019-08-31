@@ -97,7 +97,7 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-# VS Code workspace
+# VSCode workspace settings
 *code-workspace
 .vscode
 

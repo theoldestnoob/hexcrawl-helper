@@ -300,6 +300,48 @@ class TestDieSet(unittest.TestCase):
         dieset_neg1d6 = dice.DieSet("-1d6")
         self.assertEqual(dieset_neg1d6.probability(-3), 0.16667)
 
+    def test_DieSet_probability_range_1d6_1to3(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.probability_range(1, 3), 0.50001)
+
+    def test_DieSet_probability_range_1d6_4to5(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_1d6.probability_range(4, 5), 0.33334)
+
+    def test_DieSet_probability_range_2d4_2to4(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertEqual(dieset_2d4.probability_range(2, 4), 0.375)
+
+    def test_DieSet_probability_range_2d4_4to6(self):
+        dieset_2d4 = dice.DieSet("2d4")
+        self.assertEqual(dieset_2d4.probability_range(4, 6), 0.625)
+
+    def test_DieSet_probability_range_neg1d6_neg4toneg3(self):
+        dieset_neg1d6 = dice.DieSet("-1d6")
+        self.assertEqual(dieset_neg1d6.probability_range(-4, -3), 0.33334)
+
+    def test_DieSet_probability_range_1d6_5to1(self):
+        dieset_neg1d6 = dice.DieSet("1d6")
+        self.assertEqual(dieset_neg1d6.probability_range(5, 1), 0.83335)
+
+    def test_DieSet_probability_range_6d1_1to3(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        with self.assertRaisesRegex(ValueError,
+                                    "Argument '1' not in valid range 6 - 6"):
+            dieset_6d1.probability_range(1, 3)
+
+    def test_DieSet_probability_range_6d1_5to6(self):
+        dieset_6d1 = dice.DieSet("6d1")
+        with self.assertRaisesRegex(ValueError,
+                                    "Argument '5' not in valid range 6 - 6"):
+            dieset_6d1.probability_range(5, 6)
+
+    def test_DieSet_probability_range_1d6_5to7(self):
+        dieset_1d6 = dice.DieSet("1d6")
+        with self.assertRaisesRegex(ValueError,
+                                    "Argument '7' not in valid range 1 - 6"):
+            dieset_1d6.probability_range(5, 7)
+
 
 class TestDieExpr(unittest.TestCase):
 
@@ -553,6 +595,51 @@ class TestDieExpr(unittest.TestCase):
     def test_DieExpr_probability_1d8_1d10_1d4_m_2_9(self):
         dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
         self.assertEqual(dieexpr_1d8_1d10_1d4_m_2.probability(9), 0.09062)
+
+    def test_DieExpr_probability_range_1d6_1to3(self):
+        dieexpr_1d6 = dice.DieExpr("1d6")
+        self.assertEqual(dieexpr_1d6.probability_range(1, 3), 0.50001)
+
+    def test_DieExpr_probability_range_1d6_4to5(self):
+        dieexpr_1d6 = dice.DieExpr("1d6")
+        self.assertEqual(dieexpr_1d6.probability_range(4, 5), 0.33334)
+
+    def test_DieExpr_probability_range_2d4_2to4(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        self.assertEqual(dieexpr_2d4.probability_range(2, 4), 0.375)
+
+    def test_DieExpr_probability_range_2d4_4to6(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        self.assertEqual(dieexpr_2d4.probability_range(4, 6), 0.625)
+
+    def test_DieExpr_probability_range_1d6_p_1d4_2to4(self):
+        dieexpr_1d6_p_1d4 = dice.DieExpr("1d6+1d4")
+        self.assertEqual(dieexpr_1d6_p_1d4.probability_range(2, 4), 0.25)
+
+    def test_DieExpr_probability_range_1d6_m_1d4_m2to2(self):
+        dieexpr_1d6_m_1d4 = dice.DieExpr("1d6-1d4")
+        self.assertEqual(dieexpr_1d6_m_1d4.probability_range(-2, 2), 0.70834)
+
+    def test_DieExpr_probability_range_1d10_m_2_1to8(self):
+        dieexpr_1d10_m_2 = dice.DieExpr("1d10-2")
+        self.assertEqual(dieexpr_1d10_m_2.probability_range(1, 8), 0.8)
+
+    def test_DieExpr_probability_range_1d8_1d10_1d4_m_2_8to13(self):
+        dieexpr_1d8_1d10_1d4_m_2 = dice.DieExpr("1d8+1d10+1d4-2")
+        self.assertEqual(dieexpr_1d8_1d10_1d4_m_2.probability_range(8, 13),
+                         0.5375)
+
+    def test_DieExpr_probability_range_2d4_6to9(self):
+        dieexpr_2d4 = dice.DieExpr("2d4")
+        with self.assertRaisesRegex(ValueError,
+                                    "Argument '9' not in valid range 2 - 8"):
+            dieexpr_2d4.probability_range(6, 9)
+
+    def test_DieExpr_probability_range_1d6_1d4_1to5(self):
+        dieexpr_2d4 = dice.DieExpr("1d6+1d4")
+        with self.assertRaisesRegex(ValueError,
+                                    "Argument '1' not in valid range 2 - 10"):
+            dieexpr_2d4.probability_range(1, 5)
 
 
 if __name__ == "__main__":

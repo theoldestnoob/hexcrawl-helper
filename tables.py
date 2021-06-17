@@ -23,9 +23,14 @@ class TableEntry:
         #   magnitude determines how much it wants to be high or low
         self.pos_weight = pos_wt
         # probability weight
-        #   positive if entry wants to be more probable
-        #   negative if entry wants to be less probable
+        #   positive if entry wants to be more probable (center)
+        #   negative if entry wants to be less probable (edges)
+        #   magnitude determines how central or edgy it wants to be
         self.prob_weight = prob_wt
+        # combined weight
+        #   combined position and probability weights
+        #   derived value determined on table generation
+        self._weight = 0
         # longer string for more detail on entry
         self.notes = notes
 
@@ -36,21 +41,24 @@ class TableEntry:
                 and self.prob_weight == other.prob_weight
                 and self.notes == other.notes)
 
-    def get_entry(self, depth: int = 0) -> TableEntry:
+    def get_entry(self, *args, **kwargs) -> TableEntry:
         return self
 
 
-class Table:
+class Table(TableEntry):
     def __init__(self, name: str, diestr: dice.DieSet = None,
+                 priority: int = 99, pos_wt: int = 0, prob_wt: int = 0,
                  entries: list[TableEntry] = None) -> None:
         self.name = name
+        self.priority = priority
+        self.pos_weight = pos_wt
+        self.prob_weight = prob_wt
         if entries is not None:
             self._entries = entries
         else:
             self._entries = []
         self._table = []
         self.set_dice(diestr)
-        self.gen_table()
 
     def append(self, entry) -> None:
         self._entries.append(entry)
@@ -79,11 +87,14 @@ class Table:
     def __getitem__(self, position: int) -> TableEntry:
         if self._changed:
             self.gen_table()
-        index = 1
         if self._dice is not None:
             if position < self._dice.minroll or position > self._dice.maxroll:
                 raise IndexError
             index = self._dice.minroll
+        else:
+            if position < 1 or position > len(self._entries):
+                raise IndexError
+            index = 1
         return self._table[position - index]
 
     def get_entry(self, depth: int = 0) -> TableEntry:
@@ -99,6 +110,8 @@ class Table:
         else:
             return self.__getitem__(index)
 
+    # TODO: replace the set_dice() method with set_size() method
+    #       and push dice and random functionality up to a container class
     def set_dice(self, diestr) -> None:
         if diestr is None:
             self._dice = None
@@ -114,12 +127,69 @@ class Table:
 
     def gen_table(self) -> None:
         if self._dice is None:
-            for e in self._entries:
-                self._table.append(e)
+            tablesize = len(self._entries)
         else:
             tablesize = self._dice.rollrange
-            table = sorted(self._entries, key=lambda entry: entry.prob_weight,
-                           reverse=True)
-            table = sorted(self._entries, key=lambda entry: entry.priority)
-            self._table = table[:tablesize]
+        if tablesize == 0:
+            self._table = []
+            return
+        # sort on entry priority and cut table down to size
+        #  first sort on probability so we drop low probability entries first
+        table = sorted(self._entries, key=lambda entry: entry.prob_weight,
+                       reverse=True)
+        table = sorted(table, key=lambda entry: entry.priority)
+        table = table[:tablesize]
+        # determine if multiple position weights
+        one_pos_weight = True
+        e_zero_wt = table[0].pos_weight
+        for e in table:
+            if e.pos_weight != e_zero_wt:
+                one_pos_weight = False
+        # for multiple position weights we split the table into two
+        #  and derive a combined position + probability weight
+        if not one_pos_weight:
+            # sort on position weight
+            table = sorted(table, key=lambda entry: entry.pos_weight)
+            # split into top and bottom half
+            halfway = len(table) // 2
+            table_bottom = table[:halfway]
+            table_top = table[halfway:]
+            # add probability to bottom half (higher = more central)
+            # subtract probability from top half (lower = more central)
+            for e in table_bottom:
+                e._weight = e.pos_weight + e.prob_weight
+            for e in table_top:
+                e._weight = e.pos_weight - e.prob_weight
+            # combine halves to make a complete sorted table
+            table_bottom = sorted(table_bottom, key=lambda e: e._weight)
+            table_top = sorted(table_top, key=lambda e: e._weight)
+            table = table_bottom
+            table.extend(table_top)
+        # for a single position weight we split the table by probability
+        #  and distribute evenly between the halves in order
+        else:
+            probdict = {}
+            table_bottom = []
+            table_top = []
+            bottom = True
+            # split into lists by probability weight
+            for e in table:
+                if e.prob_weight not in probdict.keys():
+                    probdict[e.prob_weight] = [e]
+                else:
+                    probdict[e.prob_weight].append(e)
+            # distribute across two halves of table in order by probability
+            for key in sorted(probdict.keys(), key=lambda prob: prob,
+                              reverse=True):
+                for e in probdict[key]:
+                    if bottom:
+                        table_bottom.insert(0, e)
+                        bottom = False
+                    else:
+                        table_top.append(e)
+                        bottom = True
+            # combine two table halves
+            table = table_bottom
+            table.extend(table_top)
+        self._table = table
         self._changed = False

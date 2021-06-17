@@ -48,20 +48,24 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table._entries[0], entry)
 
     def test_Table_getitem_no_die(self):
-        self.assertEqual(self.table[1].name, 'Entry 1-1')
-        self.assertEqual(self.table[2].name, 'Entry 1-2')
-        self.assertEqual(self.table[3].name, 'Entry 1-3')
-        self.assertEqual(self.table[4].name, 'Entry 1-4')
-        self.assertEqual(self.table[5].name, 'Entry 1-5')
-        self.assertEqual(self.table[6].name, 'Entry 1-6')
+        self.assertIsInstance(self.table[1], tables.TableEntry)
+        self.assertIsInstance(self.table[2], tables.TableEntry)
+        self.assertIsInstance(self.table[3], tables.TableEntry)
+        self.assertIsInstance(self.table[4], tables.TableEntry)
+        self.assertIsInstance(self.table[5], tables.TableEntry)
+        self.assertIsInstance(self.table[6], tables.TableEntry)
+        with self.assertRaises(IndexError):
+            self.table[7]
+        with self.assertRaises(IndexError):
+            self.table[0]
 
     def test_Table_getitem_with_die(self):
         self.table.set_dice('2d3')
-        self.assertEqual(self.table[2].name, 'Entry 1-1')
-        self.assertEqual(self.table[3].name, 'Entry 1-2')
-        self.assertEqual(self.table[4].name, 'Entry 1-3')
-        self.assertEqual(self.table[5].name, 'Entry 1-4')
-        self.assertEqual(self.table[6].name, 'Entry 1-5')
+        self.assertIsInstance(self.table[2], tables.TableEntry)
+        self.assertIsInstance(self.table[3], tables.TableEntry)
+        self.assertIsInstance(self.table[4], tables.TableEntry)
+        self.assertIsInstance(self.table[5], tables.TableEntry)
+        self.assertIsInstance(self.table[6], tables.TableEntry)
         with self.assertRaises(IndexError):
             self.table[1]
         with self.assertRaises(IndexError):
@@ -108,6 +112,93 @@ class TestTable(unittest.TestCase):
         for x in table._table:
             self.assertEqual(x.priority, 0)
 
+    def test_Table_entry_position(self):
+        table = tables.Table('Test')
+        table.append(tables.TableEntry('Pos-2', pos_wt=-2))
+        table.append(tables.TableEntry('Pos12', pos_wt=12))
+        table.append(tables.TableEntry('Pos0', pos_wt=0))
+        table.append(tables.TableEntry('Pos3', pos_wt=3))
+        table.append(tables.TableEntry('Pos7', pos_wt=7))
+        table.append(tables.TableEntry('Pos4', pos_wt=4))
+        self.assertEqual(table[1].name, 'Pos-2')
+        self.assertEqual(table[2].name, 'Pos0')
+        self.assertEqual(table[3].name, 'Pos3')
+        self.assertEqual(table[4].name, 'Pos4')
+        self.assertEqual(table[5].name, 'Pos7')
+        self.assertEqual(table[6].name, 'Pos12')
+
+    def test_Table_entry_pos_prio(self):
+        table = tables.Table('Test')
+        table.append(tables.TableEntry('Pos-2', pos_wt=-2, priority=5))
+        table.append(tables.TableEntry('Pos12', pos_wt=12, priority=1))
+        table.append(tables.TableEntry('Pos0', pos_wt=0, priority=1))
+        table.append(tables.TableEntry('Pos3', pos_wt=3, priority=10))
+        table.append(tables.TableEntry('Pos7', pos_wt=7, priority=1))
+        table.append(tables.TableEntry('Pos4', pos_wt=4, priority=10))
+        table.set_dice('1d4')
+        self.assertEqual(table[1].name, 'Pos-2')
+        self.assertEqual(table[2].name, 'Pos0')
+        self.assertEqual(table[3].name, 'Pos7')
+        self.assertEqual(table[4].name, 'Pos12')
+
+    def test_Table_entry_probability_simple(self):
+        table = tables.Table('Test')
+        table.append(tables.TableEntry('Prob0', prob_wt=0))
+        table.append(tables.TableEntry('Prob0', prob_wt=0))
+        table.append(tables.TableEntry('Prob1', prob_wt=1))
+        table.append(tables.TableEntry('Prob1', prob_wt=1))
+        table.append(tables.TableEntry('Prob-1', prob_wt=-1))
+        table.append(tables.TableEntry('Prob-1', prob_wt=-1))
+        self.assertEqual(table[1].name, 'Prob-1')
+        self.assertEqual(table[2].name, 'Prob0')
+        self.assertEqual(table[3].name, 'Prob1')
+        self.assertEqual(table[4].name, 'Prob1')
+        self.assertEqual(table[5].name, 'Prob0')
+        self.assertEqual(table[6].name, 'Prob-1')
+
+    def test_Table_entry_prob_smaller_table_than_entries(self):
+        table = tables.Table('Test')
+        table.append(tables.TableEntry('Prob0', prob_wt=0))
+        table.append(tables.TableEntry('Prob0', prob_wt=0))
+        table.append(tables.TableEntry('Prob1', prob_wt=1))
+        table.append(tables.TableEntry('Prob1', prob_wt=1))
+        table.append(tables.TableEntry('Prob-1', prob_wt=-1))
+        table.append(tables.TableEntry('Prob-1', prob_wt=-1))
+        table.set_dice('1d4')
+        self.assertEqual(table[1].name, 'Prob0')
+        self.assertEqual(table[2].name, 'Prob1')
+        self.assertEqual(table[3].name, 'Prob1')
+        self.assertEqual(table[4].name, 'Prob0')
+
+    def test_Table_entry_prob_prio(self):
+        table = tables.Table('Test')
+        table.append(tables.TableEntry('Prob0', prob_wt=0, priority=1))
+        table.append(tables.TableEntry('Prob0', prob_wt=0, priority=1))
+        table.append(tables.TableEntry('Prob1', prob_wt=1, priority=1))
+        table.append(tables.TableEntry('Prob1', prob_wt=1, priority=1))
+        table.append(tables.TableEntry('Prob-1', prob_wt=-1, priority=0))
+        table.append(tables.TableEntry('Prob-1', prob_wt=-1, priority=1))
+        table.set_dice('1d4')
+        self.assertIn(table[1].name, ['Prob-1', 'Prob0'])
+        self.assertEqual(table[2].name, 'Prob1')
+        self.assertEqual(table[3].name, 'Prob1')
+        self.assertIn(table[4].name, ['Prob-1', 'Prob0'])
+        self.assertNotEqual(table[1].name, table[4].name)
+
+    def test_Table_entry_pos_prob(self):
+        table = tables.Table('Sorting Test')
+        print("test start")
+        table.append(tables.TableEntry('11', pos_wt=1, prob_wt=1))
+        table.append(tables.TableEntry('21', pos_wt=2, prob_wt=1))
+        table.append(tables.TableEntry('15', pos_wt=1, prob_wt=5))
+        table.append(tables.TableEntry('25', pos_wt=2, prob_wt=5))
+        self.assertEqual(table[1].name, '11')
+        self.assertEqual(table[2].name, '15')
+        self.assertEqual(table[3].name, '25')
+        self.assertEqual(table[4].name, '21')
+
+    def test_Table_entry_pos_prob_prio(self):
+        pass
 
 
 if __name__ == '__main__':
